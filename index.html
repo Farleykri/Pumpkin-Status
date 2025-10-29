@@ -16,13 +16,36 @@
     transition: background-color .4s, color .4s;
   }
   .wrap { text-align: center; }
-  .pumpkin { font-size: clamp(120px, 22vw, 280px); line-height: 1; }
-  .up { background: #ff8a00; color: #000; animation: float 3s ease-in-out infinite; }
-  .down { animation: sleepy 3s ease-in-out infinite; }
-  @keyframes float { 0%{transform:translateY(0)}50%{transform:translateY(-10px)}100%{transform:translateY(0)} }
-  @keyframes sleepy { 0%,100%{transform:translateY(0)}50%{transform:translateY(6px) scale(0.96)} }
-  h1 { font-size: clamp(48px,6vw,96px); margin: 0.25rem 0; }
-  .time { opacity: 0.8; font-size: clamp(14px,2.2vw,18px); }
+  .pumpkin {
+    font-size: clamp(160px, 24vw, 320px);
+    line-height: 1;
+    animation: float 3s ease-in-out infinite;
+  }
+  .up {
+    background: #ff8a00;
+    color: #000;
+  }
+  .down {
+    animation: sleepy 3s ease-in-out infinite;
+  }
+  @keyframes float {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0); }
+  }
+  @keyframes sleepy {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(6px) scale(0.96); }
+  }
+  h1 {
+    font-size: clamp(48px,6vw,96px);
+    margin: 0.25rem 0;
+    font-weight: 800;
+  }
+  .time {
+    opacity: 0.85;
+    font-size: clamp(14px,2.2vw,18px);
+  }
 </style>
 </head>
 <body>
@@ -33,30 +56,24 @@
   </div>
 <script>
 (async function() {
-  const pumpkin = document.getElementById('pumpkin');
   const statusEl = document.getElementById('status');
   const tsEl = document.getElementById('timestamp');
+  const estZone = 'America/New_York';
 
   try {
     const res = await fetch('status.json?_=' + Date.now(), { cache: 'no-store' });
     const data = await res.json();
     const up = !!data.up;
 
-    document.body.className = up ? 'up' : 'down';
-    statusEl.textContent = up ? '🎃 UP!' : '💤 DOWN…';
+    document.body.classList.toggle('up', up);
+    document.body.classList.toggle('down', !up);
+    statusEl.textContent = up ? 'UP!' : 'DOWN…';
 
-    // Timezone: America/New_York
-    const estZone = 'America/New_York';
-
-    const updated = data.timestamp ? new Date(data.timestamp) : new Date();
-
-    function formatEST(d) {
-      return d.toLocaleString('en-US', { timeZone: estZone });
-    }
-
+    // update function for both timestamps
     function updateClock() {
       const now = new Date();
-      tsEl.textContent = `Last updated: ${formatEST(updated)} (Eastern Time) | Current time: ${formatEST(now)}`;
+      const currentEST = now.toLocaleString('en-US', { timeZone: estZone });
+      tsEl.textContent = `Last updated: ${currentEST} (Eastern Time)`;
     }
 
     updateClock();
