@@ -45,13 +45,20 @@
     document.body.className = up ? 'up' : 'down';
     statusEl.textContent = up ? '🎃 UP!' : '💤 DOWN…';
 
-    // Use JSON timestamp if provided, else now
+    // Timezone: America/New_York
+    const estZone = 'America/New_York';
+
     const updated = data.timestamp ? new Date(data.timestamp) : new Date();
+
+    function formatEST(d) {
+      return d.toLocaleString('en-US', { timeZone: estZone });
+    }
+
     function updateClock() {
       const now = new Date();
-      const localTime = now.toLocaleTimeString();
-      tsEl.textContent = `Last updated: ${updated.toLocaleString()} | Current time: ${localTime}`;
+      tsEl.textContent = `Last updated: ${formatEST(updated)} (Eastern Time) | Current time: ${formatEST(now)}`;
     }
+
     updateClock();
     setInterval(updateClock, 1000);
 
