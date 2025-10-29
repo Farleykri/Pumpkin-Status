@@ -1,0 +1,15 @@
+<html>
+  <head><title>🎃 Pumpkin Status</title></head>
+  <body style="font-family:sans-serif;text-align:center;margin-top:10%">
+    <h1 id="status" style="font-size:5em;">Loading...</h1>
+    <script>
+      fetch('https://your-json-endpoint-url/status.json')
+        .then(r => r.json())
+        .then(d => {
+          document.getElementById('status').textContent = d.up ? '🎃 UP!' : '💤 DOWN...';
+          document.body.style.backgroundColor = d.up ? '#ff8800' : '#222';
+          document.body.style.color = d.up ? '#000' : '#fff';
+        });
+    </script>
+  </body>
+</html>
