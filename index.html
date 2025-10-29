@@ -5,122 +5,35 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Pumpkin Status</title>
 <style>
-  :root {
-    --bg-up: #ff8a00;
-    --bg-down: #111;
-    --fg-up: #1a1a1a;
-    --fg-down: #eee;
-  }
-
-  html, body {
-    height: 100%;
-  }
-
   body {
     margin: 0;
     display: grid;
     place-items: center;
-    font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;
-    background: var(--bg-down);
-    color: var(--fg-down);
-    transition: background-color .4s ease, color .4s ease;
+    height: 100vh;
+    font-family: system-ui, sans-serif;
+    background: #111;
+    color: #eee;
+    transition: background-color .4s, color .4s;
   }
-
-  .wrap {
-    text-align: center;
-    padding: 2rem;
-  }
-
-  .status {
-    font-size: clamp(48px, 6vw, 96px);
-    margin: 0.25rem 0 0.5rem;
-  }
-
-  .time {
-    opacity: .8;
-    font-size: clamp(14px, 2.2vw, 18px);
-  }
-
-  /* Pumpkin “emoji as art” */
-  .pumpkin {
-    font-size: clamp(120px, 22vw, 280px);
-    line-height: 1;
-    display: inline-block;
-    filter: drop-shadow(0 8px 24px rgba(0,0,0,.35));
-    will-change: transform, filter;
-  }
-
-  /* UP animation: gentle float + pulse glow */
-  @keyframes floaty {
-    0%   { transform: translateY(0px) rotate(-0.5deg); }
-    50%  { transform: translateY(-10px) rotate(0.5deg); }
-    100% { transform: translateY(0px) rotate(-0.5deg); }
-  }
-  @keyframes glow {
-    0%,100% { text-shadow: 0 0 12px rgba(255,233,160,.55), 0 0 36px rgba(255,165,0,.35); }
-    50%     { text-shadow: 0 0 22px rgba(255,233,160,.85), 0 0 48px rgba(255,165,0,.55); }
-  }
-
-  /* DOWN animation: a little squash & “Zzz” drift */
-  @keyframes sleepy {
-    0%   { transform: translateY(0) scale(1); }
-    40%  { transform: translateY(6px) scale(0.98, 0.96); }
-    100% { transform: translateY(0) scale(1); }
-  }
-  @keyframes zfloat {
-    0%   { opacity: 0; transform: translateY(8px) scale(0.9); }
-    10%  { opacity: .9; }
-    100% { opacity: 0; transform: translateY(-40px) scale(1.1); }
-  }
-
-  /* Decorative Zs */
-  .zz {
-    position: absolute;
-    left: 55%;
-    top: 35%;
-    font-size: clamp(24px, 4vw, 36px);
-    opacity: 0;
-    pointer-events: none;
-  }
-  .zz.z1 { animation: zfloat 3.2s linear infinite; }
-  .zz.z2 { animation: zfloat 3.2s linear infinite 1.1s; left: 60%; top: 30%; }
-  .zz.z3 { animation: zfloat 3.2s linear infinite 2.2s; left: 50%; top: 33%; }
-
-  /* States */
-  .is-up body, body.is-up { background: var(--bg-up); color: var(--fg-up); }
-  body.is-up .pumpkin { animation: floaty 3.6s ease-in-out infinite, glow 2.6s ease-in-out infinite; }
-  body.is-up .status { content: "UP"; }
-  body.is-down .pumpkin { animation: sleepy 2.8s ease-in-out infinite; }
-  body.is-down .zz { display: block; }
-
-  /* Reduced motion */
-  @media (prefers-reduced-motion: reduce) {
-    .pumpkin, .zz { animation: none !important; }
-  }
-
-  /* Tiny helper badge */
-  .badge {
-    position: fixed; bottom: 10px; right: 12px;
-    opacity: .6; font-size: 12px;
-  }
+  .wrap { text-align: center; }
+  .pumpkin { font-size: clamp(120px, 22vw, 280px); line-height: 1; }
+  .up { background: #ff8a00; color: #000; animation: float 3s ease-in-out infinite; }
+  .down { animation: sleepy 3s ease-in-out infinite; }
+  @keyframes float { 0%{transform:translateY(0)}50%{transform:translateY(-10px)}100%{transform:translateY(0)} }
+  @keyframes sleepy { 0%,100%{transform:translateY(0)}50%{transform:translateY(6px) scale(0.96)} }
+  h1 { font-size: clamp(48px,6vw,96px); margin: 0.25rem 0; }
+  .time { opacity: 0.8; font-size: clamp(14px,2.2vw,18px); }
 </style>
 </head>
-<body class="is-down">
+<body>
   <div class="wrap">
-    <div style="position:relative; display:inline-block;">
-      <div class="pumpkin" aria-hidden="true">🎃</div>
-      <div class="zz z1">Z</div>
-      <div class="zz z2">Z</div>
-      <div class="zz z3">Z</div>
-    </div>
-    <h1 id="status" class="status">Loading…</h1>
-    <div id="timestamp" class="time"></div>
+    <div id="pumpkin" class="pumpkin">🎃</div>
+    <h1 id="status">Loading…</h1>
+    <div class="time" id="timestamp"></div>
   </div>
-  <div class="badge" id="badge">pumpkin-status</div>
-
 <script>
 (async function() {
-  const body = document.body;
+  const pumpkin = document.getElementById('pumpkin');
   const statusEl = document.getElementById('status');
   const tsEl = document.getElementById('timestamp');
 
@@ -129,13 +42,18 @@
     const data = await res.json();
     const up = !!data.up;
 
-    body.classList.toggle('is-up', up);
-    body.classList.toggle('is-down', !up);
+    document.body.className = up ? 'up' : 'down';
     statusEl.textContent = up ? '🎃 UP!' : '💤 DOWN…';
 
-    // Timestamp display (fallback if missing)
-    const ts = data.timestamp ? new Date(data.timestamp) : new Date();
-    tsEl.textContent = 'Last updated: ' + ts.toLocaleString();
+    // Use JSON timestamp if provided, else now
+    const updated = data.timestamp ? new Date(data.timestamp) : new Date();
+    function updateClock() {
+      const now = new Date();
+      const localTime = now.toLocaleTimeString();
+      tsEl.textContent = `Last updated: ${updated.toLocaleString()} | Current time: ${localTime}`;
+    }
+    updateClock();
+    setInterval(updateClock, 1000);
 
   } catch (e) {
     statusEl.textContent = '❓ Unknown';
