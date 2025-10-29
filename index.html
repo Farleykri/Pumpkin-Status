@@ -15,33 +15,43 @@
     color: #eee;
     transition: background-color .4s, color .4s;
   }
+
   .wrap { text-align: center; }
+
   .pumpkin {
     font-size: clamp(160px, 24vw, 320px);
     line-height: 1;
     animation: float 3s ease-in-out infinite;
   }
+
   .up {
     background: #ff8a00;
     color: #000;
   }
+
   .down {
+    background: #111;
+    color: #eee;
     animation: sleepy 3s ease-in-out infinite;
   }
+
   @keyframes float {
     0% { transform: translateY(0); }
     50% { transform: translateY(-10px); }
     100% { transform: translateY(0); }
   }
+
   @keyframes sleepy {
     0%,100% { transform: translateY(0); }
     50% { transform: translateY(6px) scale(0.96); }
   }
+
   h1 {
     font-size: clamp(48px,6vw,96px);
     margin: 0.25rem 0;
     font-weight: 800;
   }
+
   .time {
     opacity: 0.85;
     font-size: clamp(14px,2.2vw,18px);
@@ -54,35 +64,32 @@
     <h1 id="status">Loading…</h1>
     <div class="time" id="timestamp"></div>
   </div>
+
 <script>
+/* ------------------------------------------------------------------
+   🟢 CONTROL VARIABLE — CHANGE THIS TO TRUE OR FALSE
+   ------------------------------------------------------------------ */
+const PUMPKIN_IS_UP = true;  // <-- toggle this to false for DOWN
+
 (async function() {
   const statusEl = document.getElementById('status');
   const tsEl = document.getElementById('timestamp');
   const estZone = 'America/New_York';
 
-  try {
-    const res = await fetch('status.json?_=' + Date.now(), { cache: 'no-store' });
-    const data = await res.json();
-    const up = !!data.up;
+  // Apply state immediately
+  document.body.classList.toggle('up', PUMPKIN_IS_UP);
+  document.body.classList.toggle('down', !PUMPKIN_IS_UP);
+  statusEl.textContent = PUMPKIN_IS_UP ? 'UP!' : 'DOWN…';
 
-    document.body.classList.toggle('up', up);
-    document.body.classList.toggle('down', !up);
-    statusEl.textContent = up ? 'UP!' : 'DOWN…';
-
-    // update function for both timestamps
-    function updateClock() {
-      const now = new Date();
-      const currentEST = now.toLocaleString('en-US', { timeZone: estZone });
-      tsEl.textContent = `Last updated: ${currentEST} (Eastern Time)`;
-    }
-
-    updateClock();
-    setInterval(updateClock, 1000);
-
-  } catch (e) {
-    statusEl.textContent = '❓ Unknown';
-    tsEl.textContent = 'Could not load status.json';
+  // Keep the timestamp live in Eastern Time
+  function updateClock() {
+    const now = new Date();
+    const currentEST = now.toLocaleString('en-US', { timeZone: estZone });
+    tsEl.textContent = `Last updated: ${currentEST} (Eastern Time)`;
   }
+
+  updateClock();
+  setInterval(updateClock, 1000);
 })();
 </script>
 </body>
