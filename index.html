@@ -1,15 +1,54 @@
-<html>
-  <head><title>🎃 Pumpkin Status</title></head>
-  <body style="font-family:sans-serif;text-align:center;margin-top:10%">
-    <h1 id="status" style="font-size:5em;">Loading...</h1>
-    <script>
-      fetch('https://your-json-endpoint-url/status.json')
-        .then(r => r.json())
-        .then(d => {
-          document.getElementById('status').textContent = d.up ? '🎃 UP!' : '💤 DOWN...';
-          document.body.style.backgroundColor = d.up ? '#ff8800' : '#222';
-          document.body.style.color = d.up ? '#000' : '#fff';
-        });
-    </script>
-  </body>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pumpkin Status</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      margin-top: 10%;
+      background-color: #222;
+      color: #fff;
+      transition: background-color 0.5s;
+    }
+    .up {
+      background-color: #ff8800;
+      color: black;
+    }
+    h1 {
+      font-size: 6em;
+      margin-bottom: 0;
+    }
+    p {
+      font-size: 1.5em;
+      margin-top: 0;
+    }
+  </style>
+</head>
+<body>
+  <h1 id="status">Loading...</h1>
+  <p id="timestamp"></p>
+  <script>
+    fetch('status.json?_=' + Date.now())
+      .then(r => r.json())
+      .then(data => {
+        const statusEl = document.getElementById('status');
+        const ts = document.getElementById('timestamp');
+        const up = data.up;
+        if (up) {
+          document.body.classList.add('up');
+          statusEl.textContent = '🎃 UP!';
+        } else {
+          document.body.classList.remove('up');
+          statusEl.textContent = '💤 DOWN...';
+        }
+        ts.textContent = 'Last updated: ' + new Date(data.timestamp).toLocaleString();
+      })
+      .catch(() => {
+        document.getElementById('status').textContent = '❓ Unknown';
+      });
+  </script>
+</body>
 </html>
