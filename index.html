@@ -79,7 +79,7 @@ const PUMPKIN_IS_UP = false;  // <-- toggle this to false for DOWN
   // Apply state immediately
   document.body.classList.toggle('up', PUMPKIN_IS_UP);
   document.body.classList.toggle('down', !PUMPKIN_IS_UP);
-  statusEl.textContent = PUMPKIN_IS_UP ? 'UP!' : 'DOWN…';
+  statusEl.textContent = PUMPKIN_IS_UP ? 'PUMPKIN IS UP!' : 'PUMPKIN IS SLEEPING…';
 
   // Keep the timestamp live in Eastern Time
   function updateClock() {
