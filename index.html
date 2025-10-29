@@ -48,6 +48,30 @@
     opacity: 0.85;
     font-size: clamp(14px,2.2vw,18px);
   }
+
+  /* --- Donate bubble --- */
+  .donate-bubble {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #ff8a00;
+    color: #000;
+    border-radius: 50px;
+    padding: 14px 22px;
+    font-weight: 700;
+    text-decoration: none;
+    box-shadow: 0 0 20px rgba(255,138,0,0.6);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    animation: pulse 2.5s infinite;
+  }
+  .donate-bubble:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 30px rgba(255,138,0,0.8);
+  }
+  @keyframes pulse {
+    0%,100% { box-shadow: 0 0 15px rgba(255,138,0,0.5); }
+    50% { box-shadow: 0 0 25px rgba(255,200,0,0.9); }
+  }
 </style>
 </head>
 <body>
@@ -56,6 +80,12 @@
     <h1 id="status">Loading…</h1>
     <div class="time" id="timestamp"></div>
   </div>
+
+  <!-- 💰 Donate Bubble -->
+  <a href="https://gofund.me/d5c52685b"
+     class="donate-bubble"
+     target="_blank"
+     rel="noopener noreferrer">🎁 Donate to the Pumpkin Fund</a>
 
 <script>
 (async function() {
