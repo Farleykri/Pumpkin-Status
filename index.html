@@ -48,6 +48,10 @@
     opacity: 0.85;
     font-size: clamp(14px,2.2vw,18px);
   }
+  .stale .time {
+    color: #fff3cd;
+    font-weight: 700;
+  }
 
   /* --- Bubble button styles --- */
   .bubble-container {
@@ -105,23 +109,30 @@
   const statusEl = document.getElementById('status');
   const tsEl = document.getElementById('timestamp');
   const estZone = 'America/New_York';
+  const staleAfterMs = 8 * 60 * 60 * 1000;
 
   async function refreshStatus() {
     try {
       const res = await fetch('status.json?_=' + Date.now(), { cache: 'no-store' });
       const data = await res.json();
       const up = !!data.up;
-      const updated = data.timestamp ? new Date(data.timestamp) : new Date();
+      const updated = data.timestamp ? new Date(data.timestamp) : null;
+      const stale = !updated || Number.isNaN(updated.getTime()) ||
+        Date.now() - updated.getTime() > staleAfterMs;
 
       document.body.classList.toggle('up', up);
       document.body.classList.toggle('down', !up);
+      document.body.classList.toggle('stale', stale);
       statusEl.textContent = up ? 'PUMPKIN IS UP!' : 'PUMPKIN IS SLEEPING…';
 
       const now = new Date();
       const nowEST = now.toLocaleString('en-US', { timeZone: estZone });
-      const updatedEST = updated.toLocaleString('en-US', { timeZone: estZone });
-      tsEl.textContent =
-        `Last updated: ${updatedEST} | Current time: ${nowEST} (Eastern Time)`;
+      const updatedEST = updated
+        ? updated.toLocaleString('en-US', { timeZone: estZone })
+        : 'unknown';
+      tsEl.textContent = stale
+        ? `⚠ Status may be stale. Last verified: ${updatedEST} | Current time: ${nowEST} (Eastern Time)`
+        : `Last verified: ${updatedEST} | Current time: ${nowEST} (Eastern Time)`;
     } catch (e) {
       statusEl.textContent = '❓ Unable to load status.json';
       console.error(e);
